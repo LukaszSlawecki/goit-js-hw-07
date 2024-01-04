@@ -3,19 +3,26 @@ import { galleryItems } from './gallery-items.js';
 
 console.log(galleryItems);
 
-const galleryItemsMarkup = galleryItems
-  .map((item) => {
-    return `<a class="gallery__item" href="${item.original}">
-  <img class="gallery__image" src="${item.preview}" alt="${item.description}" />
-</a>`;
-  })
-  .join("");
+// it`s gallery DOM element
+const galleryContainer = document.querySelector(".gallery");
+// creating (rendering) card  
+function createElementMarkup(markup) {
+   return markup.map(({ description, preview, original }) => {
+    
+    return `
+    <a class="gallery__item" href="${original}">
+  <img class="gallery__image" loading="lazy" src=${preview} alt="${description}" />
+</a>
+    `
+}).join("")}
+// Edding card in the gallary
+galleryContainer.insertAdjacentHTML("beforeend",
+    createElementMarkup(galleryItems));
+// simple light box
+const lightbox = new SimpleLightbox('.gallery a',
+    {
+    captionsData: "alt",
+    }
+);
 
-const galleryEl = document.querySelector("ul.gallery");
-galleryEl.innerHTML = galleryItemsMarkup;
-
-var lightbox = new SimpleLightbox(".gallery a", {
-  captionsData: "alt",
-  captionPosition: "bottom",
-  captionDelay: 250,
-}); nnb
+lightbox.on('show.simplelightbox'); 

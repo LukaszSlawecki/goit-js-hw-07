@@ -1,49 +1,64 @@
 import { galleryItems } from './gallery-items.js';
-// Change code below this line
+// it`s gallery DOM element
+const galleryContainer = document.querySelector(".gallery");
+// creating (rendering) card  
+function createElementMarkup(markup) {
+    return markup.map(({ description, preview, original }) => {
+    
+    return `
+    <div class="gallery__item">
+        <a class="gallery__link" href="${original}">
+        <img
+            class="gallery__image lazyload"
+            data-src=${preview}
+            data-source=${original}
+            alt="${description}"
+        />
+        </a>
+    </div>
+    `
+    }).join("")
+};
+// Edding card in the gallary
+galleryContainer.insertAdjacentHTML("beforeend",
+    createElementMarkup(galleryItems));
 
-const galleryItemsMarkup = galleryItems
-  .map((item) => {
-    return `<div class="gallery__item">
-  <a class="gallery__link" href="${item.original}">
-    <img
-      class="gallery__image"
-      src="${item.preview}"
-      data-source="${item.original}"
-      alt="${item.description}"
-    />
-  </a>
-</div>`;
-  })
-  .join("");
-
-const galleryEl = document.querySelector("div.gallery");
-
-galleryEl.innerHTML = galleryItemsMarkup;
-galleryEl.addEventListener("click", selectItem);
-
-function selectItem(event) {
-  event.preventDefault();
-
-  if (!event.target.classList.contains("gallery__image")) {
-    return;
-  }
-
-  const instance = basicLightbox.create(
-    `<img src="${event.target.dataset.source}">`,
-    {
-      onShow: (instance) => {
-        document.addEventListener("keydown", onEscKeyPress);
-      },
-      onClose: (instance) => {
-        document.removeEventListener("keydown", onEscKeyPress);
-      },
+// handler show modal
+const handleOpenModalShowOriginalPicture = (event) => {
+    
+    // click on img only
+    if (event.target.nodeName !== "IMG") {
+        return;
     }
-  );
-  instance.show();
+    // default link open
+    event.preventDefault();
 
-  function onEscKeyPress(event) {
-    if (event.code === "Escape") {
-      instance.close();
-    }
-  }
+    // link big picture
+    const linkOriginalPicture = event.target.dataset.source;
+    // creat modal element
+    const modal = basicLightbox.create(`
+    <div class="modal">
+        <img src="${linkOriginalPicture}" >
+    </div>
+    `,
+    //options modal 
+        {
+        onShow: () => { 
+            document.addEventListener("keydown", handleCloseModalKeyEsc);
+            },
+        onClose: () => {
+            document.removeEventListener("keydown", handleCloseModalKeyEsc) 
+            }
+        }
+    );
+    // show modal element
+    modal.show();
+    // handler closed model key "esc"
+    function handleCloseModalKeyEsc (event) {
+            if (event.key === "Escape") {
+                modal.close();
+        }
+    } 
 }
+
+galleryContainer.addEventListener("click", handleOpenModalShowOriginalPicture);
